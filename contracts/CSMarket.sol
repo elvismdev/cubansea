@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppeling/contracts/token/ERC721/ERC721.sol";
-import "@openzeppeling/contracts/security/ReentrancyGuard.sol";
-import "@openzeppeling/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 // Security against transactions for multiple requests.
 import "hardhat/console.sol";
 
