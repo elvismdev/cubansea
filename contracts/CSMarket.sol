@@ -32,7 +32,6 @@ contract CSMarket is ReentrancyGuard {
     }
 
     // Structs can act like objects.
-
     struct MarketToken {
         uint256 itemId;
         address nftContract;
@@ -44,7 +43,6 @@ contract CSMarket is ReentrancyGuard {
     }
 
     // tokenId return which MarketToken - fetch which one it is.
-
     mapping(uint256 => MarketToken) private idToMarketToken;
 
     // listen to events from front end applications.
@@ -109,7 +107,6 @@ contract CSMarket is ReentrancyGuard {
     }
 
     // Function to conduct transactions and market sales.
-
     function createMarketSale(address nftContract, uint256 itemId)
         public
         payable
@@ -134,7 +131,6 @@ contract CSMarket is ReentrancyGuard {
     }
 
     // Function to fetchMarketItems - minting, buying and selling.
-
     function fetchMarketTokens() public view returns (MarketToken[] memory) {
         uint256 itemCount = _tokenIds.current();
         uint256 unsoldItemCount = _tokenIds.current() - _tokensSold.current();
@@ -154,7 +150,6 @@ contract CSMarket is ReentrancyGuard {
     }
 
     // Returns NFTs that the user has purchased.
-
     function fetchMyNFTs() public view returns (MarketToken[] memory) {
         uint256 totalItemCount = _tokenIds.current();
         // A second counter for each induvidual user.
@@ -169,12 +164,38 @@ contract CSMarket is ReentrancyGuard {
 
         // Second loop to loop through the amount you have purchased with itemCount.
         // Check to see if the owner address is equal to msg.sender.
-
         MarketToken[] memory items = new MarketToken[](itemCount);
         for (uint256 i = 0; i < totalItemCount; i++) {
             if (idToMarketToken[i + 1].owner == msg.sender) {
                 uint256 currentId = idToMarketToken[i + 1].itemId;
                 // Current array.
+                MarketToken storage currentItem = idToMarketToken[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+        return items;
+    }
+
+    // Function for returning an array of minted NFTs.
+    function fetchItemsCreated() public view returns (MarketToken[] memory) {
+        // Instead of .owner it will be the .seller.
+        uint256 totalItemCount = _tokenIds.current();
+        uint256 itemCount = 0;
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].seller == msg.sender) {
+                itemCount += 1;
+            }
+        }
+
+        // Second loop to loop through the amount you have purchased with itemCount.
+        // Check to see if the seller address is equal to msg.sender.
+        MarketToken[] memory items = new MarketToken[](itemCount);
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].seller == msg.sender) {
+                uint256 currentId = idToMarketToken[i + 1].itemId;
                 MarketToken storage currentItem = idToMarketToken[currentId];
                 items[currentIndex] = currentItem;
                 currentIndex += 1;
