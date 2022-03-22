@@ -65,7 +65,7 @@ contract CSMarket is ReentrancyGuard {
     // 1. Create a market item to put it up for sale.
     // 2. Create a market sale for buying and selling between parties.
 
-    function mintMarketItem(
+    function makeMarketItem(
         address nftContract,
         uint256 tokenId,
         uint256 price
