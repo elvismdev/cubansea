@@ -152,4 +152,34 @@ contract CSMarket is ReentrancyGuard {
         }
         return items;
     }
+
+    // Returns NFTs that the user has purchased.
+
+    function fetchMyNFTs() public view returns (MarketToken[] memory) {
+        uint256 totalItemCount = _tokenIds.current();
+        // A second counter for each induvidual user.
+        uint256 itemCount = 0;
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].owner == msg.sender) {
+                itemCount += 1;
+            }
+        }
+
+        // Second loop to loop through the amount you have purchased with itemCount.
+        // Check to see if the owner address is equal to msg.sender.
+
+        MarketToken[] memory items = new MarketToken[](itemCount);
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].owner == msg.sender) {
+                uint256 currentId = idToMarketToken[i + 1].itemId;
+                // Current array.
+                MarketToken storage currentItem = idToMarketToken[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+        return items;
+    }
 }
