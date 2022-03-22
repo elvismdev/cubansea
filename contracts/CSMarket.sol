@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppeling/contracts/token/ERC721/ERC721.sol";
-import "@openzeppeling/contracts/security/ReentrancyGuard.sol";
-import "@openzeppeling/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 // Security against transactions for multiple requests.
 import "hardhat/console.sol";
 
@@ -65,7 +65,7 @@ contract CSMarket is ReentrancyGuard {
     // 1. Create a market item to put it up for sale.
     // 2. Create a market sale for buying and selling between parties.
 
-    function mintMarketItem(
+    function makeMarketItem(
         address nftContract,
         uint256 tokenId,
         uint256 price

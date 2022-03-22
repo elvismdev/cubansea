@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-// We will bring in the openzeppeling ERC721 NFT functionality.
+// We will bring in the openzeppelin ERC721 NFT functionality.
 
-import "@openzeppeling/contracts/token/ERC721/ERC721.sol";
-import "@openzeppeling/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppeling/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract NFT is ERC721URIStorage {
     using Counters for Counters.Counter;
