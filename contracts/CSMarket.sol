@@ -133,5 +133,23 @@ contract CSMarket is ReentrancyGuard {
         payable(owner).transfer(listingPrice);
     }
 
-    // Function to fetchMarketItems.
+    // Function to fetchMarketItems - minting, buying and selling.
+
+    function fetchMarketTokens() public view returns (MarketToken[] memory) {
+        uint256 itemCount = _tokenIds.current();
+        uint256 unsoldItemCount = _tokenIds.current() - _tokensSold.current();
+        uint256 currentIndex = 0;
+
+        // Looping over the number of items created (if number has not been sold populate the array).
+        MarketToken[] memory items = new MarketToken[](unsoldItemCount);
+        for (uint256 i = 0; i < itemCount; i++) {
+            if (idToMarketToken[i + 1].owner == address(0)) {
+                uint256 currentId = i + 1;
+                MarketToken storage currentItem = idToMarketToken[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+        return items;
+    }
 }
