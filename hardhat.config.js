@@ -1,5 +1,6 @@
+require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
-const projectId = process.env.PROJECT_ID;
+const infuraProjectId = process.env.INFURA_PROJECT_ID;
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -8,11 +9,11 @@ module.exports = {
       chainId: 1337, // config standard
     },
     mumbai: {
-      url: `https://polygon-mumbai.infura.io/v3/${projectId}`,
+      url: `https://polygon-mumbai.infura.io/v3/${infuraProjectId}`,
       accounts: [],
     },
     mainnet: {
-      url: `https://mainnet.infura.io/v3/${projectId}`,
+      url: `https://mainnet.infura.io/v3/${infuraProjectId}`,
       accounts: [],
     },
   },
