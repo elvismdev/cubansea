@@ -40,7 +40,7 @@ describe("CSMarket", function () {
       .connect(buyerAddress)
       .createMarketSale(nftContractAddress, 1, { value: auctionPrice });
 
-    let items = await market.fetchMarketTokens();
+    let items = await market.fetchMarketItems();
 
     items = await Promise.all(
       items.map(async (i) => {

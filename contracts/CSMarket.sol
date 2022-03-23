@@ -131,7 +131,7 @@ contract CSMarket is ReentrancyGuard {
     }
 
     // Function to fetchMarketItems - minting, buying and selling.
-    function fetchMarketTokens() public view returns (MarketToken[] memory) {
+    function fetchMarketItems() public view returns (MarketToken[] memory) {
         uint256 itemCount = _tokenIds.current();
         uint256 unsoldItemCount = _tokenIds.current() - _tokensSold.current();
         uint256 currentIndex = 0;
