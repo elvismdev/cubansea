@@ -1,6 +1,7 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
 const infuraProjectId = process.env.INFURA_PROJECT_ID;
+const keyData = process.env.PRIVATE_KEY;
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -10,11 +11,11 @@ module.exports = {
     },
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${infuraProjectId}`,
-      accounts: [],
+      accounts: [keyData],
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${infuraProjectId}`,
-      accounts: [],
+      accounts: [keyData],
     },
   },
   solidity: {
