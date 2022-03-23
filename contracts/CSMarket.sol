@@ -24,7 +24,7 @@ contract CSMarket is ReentrancyGuard {
     // We are deploying to matic (Polygon), the API is the same so you can use ether the same as matic.
     // They both have 18 decimal places.
     // 0.045 is in the cents.
-    uint256 listingPrice = 0.045 ether;
+    uint256 listingPrice = 0.025 ether;
 
     constructor() {
         // Set the owner.
