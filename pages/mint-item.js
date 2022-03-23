@@ -9,7 +9,7 @@ import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
 // In this component we set the IPFS up to host our NFT data of file storage.
 
-const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0/");
+const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
 export default function MintItem() {
   const [fileUrl, setFileUrl] = useState(null);
@@ -27,7 +27,7 @@ export default function MintItem() {
       const added = await client.add(file, {
         progress: (prog) => console.log(`received: ${prog}`),
       });
-      const url = `https://ipfs.infura.io:5001/api/v0/${added.path}`;
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
       setFileUrl(url);
     } catch (error) {
       console.log("Error uploading file: ", error);
@@ -45,7 +45,7 @@ export default function MintItem() {
     });
     try {
       const added = await client.add(data);
-      const url = `https://ipfs.infura.io:5001/api/v0/${added.path}`;
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
       // Run a function that creates sale and passes in the URL.
       createSale(url);
     } catch (error) {
