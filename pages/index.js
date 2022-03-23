@@ -16,6 +16,7 @@ export default function Home() {
     loadNFTs();
   }, []);
 
+  // Function to load NFTs.
   async function loadNFTs() {
     // What we want to load:
     // *** provider, tokenContract, marketContract, data for our marketItems ***
@@ -50,6 +51,29 @@ export default function Home() {
 
     setNfts(items);
     setLoadingState("loaded");
+  }
+
+  // Function to buy NFTs for market.
+  async function buyNFT(nft) {
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(
+      nftmarketaddress,
+      CSMarket.abi,
+      signer
+    );
+
+    const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
+    const transaction = await contract.createMarketSale(
+      nftaddress,
+      nft.tokenId,
+      { value: price }
+    );
+
+    await transaction.wait();
+    loadNFTs();
   }
 
   return <div>CUBANSEA MARKETPLACE</div>;
