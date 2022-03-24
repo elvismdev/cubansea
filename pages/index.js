@@ -2,8 +2,14 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
+import Image from "next/image";
 
 import { nftaddress, nftmarketaddress } from "../config";
+
+let rpcUrl = null;
+if (process.env.NEXT_PUBLIC_RPC_URL) {
+  rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
+}
 
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
@@ -21,9 +27,7 @@ export default function Home() {
     // What we want to load:
     // *** provider, tokenContract, marketContract, data for our marketItems ***
 
-    const provider = new ethers.providers.JsonRpcProvider(
-      process.env.NEXT_PUBLIC_RPC_URL
-    );
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
       nftmarketaddress,
@@ -40,7 +44,7 @@ export default function Home() {
         let price = ethers.utils.formatUnits(i.price.toString(), "ether");
         let item = {
           price,
-          tokenId: i.tokenId.toNumber(),
+          itemId: i.itemId.toNumber(),
           seller: i.seller,
           owner: i.owner,
           image: meta.data.image,
@@ -70,7 +74,7 @@ export default function Home() {
     const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
     const transaction = await contract.createMarketSale(
       nftaddress,
-      nft.tokenId,
+      nft.itemId,
       { value: price }
     );
 
@@ -87,7 +91,7 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
           {nfts.map((nft, i) => (
             <div key={i} className="border shadow rounded-x1 overflow-hidden">
-              <img src={nft.image} />
+              <Image src={nft.image} alt="" width={380} height={380} />
               <div className="p-4">
                 <p
                   style={{ height: "64px" }}
