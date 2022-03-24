@@ -5,6 +5,7 @@ import { create as ipfsHttpClient } from "ipfs-http-client";
 import { nftaddress, nftmarketaddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
 // In this component we set the IPFS up to host our NFT data of file storage.
@@ -107,7 +108,9 @@ export default function MintItem() {
         />
         <input type="file" name="Asset" className="mt-4" onChange={onChange} />
         {fileUrl && (
-          <img className="rounded mt-4" width="350px" src={fileUrl} />
+          <div className="rounded mt-4">
+            <Image src={fileUrl} alt="" width={380} height={380} />
+          </div>
         )}
         <button
           onClick={createMarket}
