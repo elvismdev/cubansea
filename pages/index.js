@@ -6,6 +6,11 @@ import Image from "next/image";
 
 import { nftaddress, nftmarketaddress } from "../config";
 
+let rpcUrl = null;
+if (process.env.NEXT_PUBLIC_RPC_URL) {
+  rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
+}
+
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
@@ -22,9 +27,7 @@ export default function Home() {
     // What we want to load:
     // *** provider, tokenContract, marketContract, data for our marketItems ***
 
-    const provider = new ethers.providers.JsonRpcProvider(
-      process.env.NEXT_PUBLIC_RPC_URL
-    );
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
       nftmarketaddress,
