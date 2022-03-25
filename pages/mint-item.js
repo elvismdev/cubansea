@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { useState } from "react";
 import Web3Modal from "web3modal";
+import { providerOptions } from "../wallets/providerOptions";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import { nftaddress, nftmarketaddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
@@ -20,6 +21,14 @@ export default function MintItem() {
     description: "",
   });
   const router = useRouter();
+
+  let web3Modal;
+  if (typeof window !== "undefined") {
+    web3Modal = new Web3Modal({
+      cacheProvider: true, // optional
+      providerOptions, // required
+    });
+  }
 
   // Set up a function to fireoff when we update files in our form - we can add our NFT images - IPFS.
   async function onChange(e) {
@@ -55,31 +64,34 @@ export default function MintItem() {
   }
 
   async function createSale(url) {
-    // Create the items and list them on the marketplace.
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    try {
+      // Create the items and list them on the marketplace.
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
 
-    // We want to create the token.
-    let contract = new ethers.Contract(nftaddress, NFT.abi, signer);
-    let transaction = await contract.mintToken(url);
-    let tx = await transaction.wait();
-    let event = tx.events[0];
-    let value = event.args[2];
-    let tokenId = value.toNumber();
-    const price = ethers.utils.parseUnits(formInput.price, "ether");
+      // We want to create the token.
+      let contract = new ethers.Contract(nftaddress, NFT.abi, signer);
+      let transaction = await contract.mintToken(url);
+      let tx = await transaction.wait();
+      let event = tx.events[0];
+      let value = event.args[2];
+      let tokenId = value.toNumber();
+      const price = ethers.utils.parseUnits(formInput.price, "ether");
 
-    // List the item for sale on the marketplace.
-    contract = new ethers.Contract(nftmarketaddress, CSMarket.abi, signer);
-    let listingPrice = await contract.getListingPrice();
-    listingPrice = listingPrice.toString();
+      // List the item for sale on the marketplace.
+      contract = new ethers.Contract(nftmarketaddress, CSMarket.abi, signer);
+      let listingPrice = await contract.getListingPrice();
+      listingPrice = listingPrice.toString();
 
-    transaction = await contract.makeMarketItem(nftaddress, tokenId, price, {
-      value: listingPrice,
-    });
-    await transaction.wait();
-    router.push("./");
+      transaction = await contract.makeMarketItem(nftaddress, tokenId, price, {
+        value: listingPrice,
+      });
+      await transaction.wait();
+      router.push("./");
+    } catch (error) {
+      // console.log(error);
+    }
   }
 
   return (
