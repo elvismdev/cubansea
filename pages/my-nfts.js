@@ -12,19 +12,19 @@ import { nftaddress, nftmarketaddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
-let web3Modal;
-if (typeof window !== "undefined") {
-  web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-    providerOptions, // required
-  });
-}
-
 export default function MyAssets() {
   // Array of NTFs.
   const [nfts, setNfts] = useState([]);
   const [provider, setProvider] = useState(null);
   const [loadingState, setLoadingState] = useState("not-loaded");
+
+  let web3Modal;
+  if (typeof window !== "undefined") {
+    web3Modal = new Web3Modal({
+      cacheProvider: true, // optional
+      providerOptions, // required
+    });
+  }
 
   // Function to connnect wallet.
   const connectWallet = async () => {
@@ -41,6 +41,7 @@ export default function MyAssets() {
   const disconnectWallet = async () => {
     await web3Modal.clearCachedProvider();
     setProvider(null);
+    setNfts([]);
   };
 
   useEffect(() => {
