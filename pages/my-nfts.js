@@ -3,7 +3,8 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { connectWallet, disconnectWallet } from "../wallets/web3ModalManager";
+import Web3Modal from "web3modal";
+import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
 
 import { nftaddress, nftmarketaddress } from "../config";
@@ -11,18 +12,41 @@ import { nftaddress, nftmarketaddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
+let web3Modal;
+if (typeof window !== "undefined") {
+  web3Modal = new Web3Modal({
+    cacheProvider: true, // optional
+    providerOptions, // required
+  });
+}
+
 export default function MyAssets() {
   // Array of NTFs.
   const [nfts, setNfts] = useState([]);
-  const [provider, setProvider] = useState();
+  const [provider, setProvider] = useState(null);
   const [loadingState, setLoadingState] = useState("not-loaded");
 
-  const updateProvider = (provider) => {
-    setProvider(provider);
+  // Function to connnect wallet.
+  const connectWallet = async () => {
+    try {
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      setProvider(provider);
+    } catch (error) {
+      // console.log(error);
+    }
+  };
+
+  // Function to disconnect wallet.
+  const disconnectWallet = async () => {
+    await web3Modal.clearCachedProvider();
+    setProvider(null);
   };
 
   useEffect(() => {
-    connectWallet(updateProvider);
+    if (web3Modal.cachedProvider) {
+      connectWallet();
+    }
   }, []);
 
   useEffect(() => {
@@ -74,18 +98,14 @@ export default function MyAssets() {
       {!provider ? (
         <button
           className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
-          onClick={() => {
-            connectWallet(updateProvider);
-          }}
+          onClick={connectWallet}
         >
           Connect Wallet
         </button>
       ) : (
         <button
           className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
-          onClick={() => {
-            disconnectWallet(updateProvider);
-          }}
+          onClick={disconnectWallet}
         >
           Disconnect Wallet
         </button>
