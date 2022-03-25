@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
+import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
 
 import { nftaddress, nftmarketaddress } from "../config";
@@ -61,7 +62,10 @@ export default function Home() {
 
   // Function to buy NFTs for market.
   async function buyNFT(nft) {
-    const web3Modal = new Web3Modal();
+    const web3Modal = new Web3Modal({
+      cacheProvider: true, // optional
+      providerOptions, // required
+    });
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();

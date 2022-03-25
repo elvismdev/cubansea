@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
+import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
 
 import { nftaddress, nftmarketaddress } from "../config";
@@ -14,20 +15,40 @@ import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 export default function MyAssets() {
   // Array of NTFs.
   const [nfts, setNfts] = useState([]);
+  const [provider, setProvider] = useState();
   const [loadingState, setLoadingState] = useState("not-loaded");
 
+  // Function to connnect wallet.
+  const connectWallet = async () => {
+    const web3Modal = new Web3Modal({
+      cacheProvider: true, // optional
+      providerOptions, // required
+    });
+
+    try {
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      setProvider(provider);
+    } catch (error) {
+      // console.log(error);
+    }
+  };
+
   useEffect(() => {
-    loadNFTs();
+    connectWallet();
   }, []);
+
+  useEffect(() => {
+    if (provider) {
+      loadNFTs();
+    }
+  }, [provider]);
 
   // Function to load NFTs.
   async function loadNFTs() {
     // What we want to load:
     // We want to get the msg.sender hook up to the signer to display the owner NFTs.
 
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
 
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
@@ -60,6 +81,16 @@ export default function MyAssets() {
     setNfts(items);
     setLoadingState("loaded");
   }
+
+  if (!provider)
+    return (
+      <button
+        className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
+        onClick={connectWallet}
+      >
+        Connect Wallet
+      </button>
+    );
 
   if (loadingState === "loaded" && !nfts.length)
     return (
