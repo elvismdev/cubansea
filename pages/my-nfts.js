@@ -3,8 +3,7 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Web3Modal from "web3modal";
-import { providerOptions } from "../wallets/providerOptions";
+import { connectWallet, disconnectWallet } from "../wallets/web3ModalManager";
 import Image from "next/image";
 
 import { nftaddress, nftmarketaddress } from "../config";
@@ -18,24 +17,12 @@ export default function MyAssets() {
   const [provider, setProvider] = useState();
   const [loadingState, setLoadingState] = useState("not-loaded");
 
-  // Function to connnect wallet.
-  const connectWallet = async () => {
-    const web3Modal = new Web3Modal({
-      cacheProvider: true, // optional
-      providerOptions, // required
-    });
-
-    try {
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      setProvider(provider);
-    } catch (error) {
-      // console.log(error);
-    }
+  const updateProvider = (provider) => {
+    setProvider(provider);
   };
 
   useEffect(() => {
-    connectWallet();
+    connectWallet(updateProvider);
   }, []);
 
   useEffect(() => {
@@ -82,50 +69,63 @@ export default function MyAssets() {
     setLoadingState("loaded");
   }
 
-  if (!provider)
-    return (
-      <button
-        className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
-        onClick={connectWallet}
-      >
-        Connect Wallet
-      </button>
-    );
-
-  if (loadingState === "loaded" && !nfts.length)
-    return (
-      <h1 className="px-20 py-7 text-4x1">
-        You do not own any NFTs currently :(
-      </h1>
-    );
-
   return (
-    <div className="flex justify-center">
-      <div className="px-4" style={{ maxWidth: "1600px" }}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-          {nfts.map((nft, i) => (
-            <div key={i} className="border shadow rounded-x1 overflow-hidden">
-              <Image src={nft.image} alt="" width={380} height={380} />
-              <div className="p-4">
-                <p
-                  style={{ height: "64px" }}
-                  className="text-3x1 font-semibold"
+    <>
+      {!provider ? (
+        <button
+          className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
+          onClick={() => {
+            connectWallet(updateProvider);
+          }}
+        >
+          Connect Wallet
+        </button>
+      ) : (
+        <button
+          className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
+          onClick={() => {
+            disconnectWallet(updateProvider);
+          }}
+        >
+          Disconnect Wallet
+        </button>
+      )}
+      {provider && loadingState === "loaded" && !nfts.length ? (
+        <h1 className="px-20 py-7 text-4x1">
+          You do not own any NFTs currently :(
+        </h1>
+      ) : (
+        <div className="flex justify-center">
+          <div className="px-4" style={{ maxWidth: "1600px" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+              {nfts.map((nft, i) => (
+                <div
+                  key={i}
+                  className="border shadow rounded-x1 overflow-hidden"
                 >
-                  {nft.name}
-                </p>
-                <div style={{ height: "72px", overflow: "hidden" }}>
-                  <p className="text-gray-400">{nft.description}</p>
+                  <Image src={nft.image} alt="" width={380} height={380} />
+                  <div className="p-4">
+                    <p
+                      style={{ height: "64px" }}
+                      className="text-3x1 font-semibold"
+                    >
+                      {nft.name}
+                    </p>
+                    <div style={{ height: "72px", overflow: "hidden" }}>
+                      <p className="text-gray-400">{nft.description}</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-black">
+                    <p className="text-3x-1 mb-4 font-bold text-white">
+                      {nft.price} ETH
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="p-4 bg-black">
-                <p className="text-3x-1 mb-4 font-bold text-white">
-                  {nft.price} ETH
-                </p>
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
