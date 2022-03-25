@@ -1,6 +1,6 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
-const infuraProjectId = process.env.INFURA_PROJECT_ID;
+const infuraProjectId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID;
 const keyData = process.env.PRIVATE_KEY;
 
 module.exports = {
