@@ -19,6 +19,14 @@ export default function Home() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
 
+  let web3Modal;
+  if (typeof window !== "undefined") {
+    web3Modal = new Web3Modal({
+      cacheProvider: true, // optional
+      providerOptions, // required
+    });
+  }
+
   useEffect(() => {
     loadNFTs();
   }, []);
@@ -62,28 +70,28 @@ export default function Home() {
 
   // Function to buy NFTs for market.
   async function buyNFT(nft) {
-    const web3Modal = new Web3Modal({
-      cacheProvider: true, // optional
-      providerOptions, // required
-    });
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      nftmarketaddress,
-      CSMarket.abi,
-      signer
-    );
+    try {
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        nftmarketaddress,
+        CSMarket.abi,
+        signer
+      );
 
-    const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
-    const transaction = await contract.createMarketSale(
-      nftaddress,
-      nft.itemId,
-      { value: price }
-    );
+      const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
+      const transaction = await contract.createMarketSale(
+        nftaddress,
+        nft.itemId,
+        { value: price }
+      );
 
-    await transaction.wait();
-    loadNFTs();
+      await transaction.wait();
+      loadNFTs();
+    } catch (error) {
+      // console.log(error);
+    }
   }
 
   if (loadingState === "loaded" && !nfts.length)
