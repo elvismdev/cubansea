@@ -8,6 +8,7 @@ import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
+import Header from "../components/Header";
 
 // In this component we set the IPFS up to host our NFT data of file storage.
 
@@ -95,42 +96,50 @@ export default function Create() {
   }
 
   return (
-    <div className="flex justify-center">
-      <div className="w-1/2 flex flex-col pb-12">
-        <input
-          placeholder="Asset Name"
-          className="mt-8 border rounded p-4"
-          onChange={(e) =>
-            updateFormInput({ ...formInput, name: e.target.value })
-          }
-        />
-        <textarea
-          placeholder="Asset Description"
-          className="mt-2 border rounded p-4"
-          onChange={(e) =>
-            updateFormInput({ ...formInput, description: e.target.value })
-          }
-        />
-        <input
-          placeholder="Asset Price in ETH"
-          className="mt-2 border rounded p-4"
-          onChange={(e) =>
-            updateFormInput({ ...formInput, price: e.target.value })
-          }
-        />
-        <input type="file" name="Asset" className="mt-4" onChange={onChange} />
-        {fileUrl && (
-          <div className="rounded mt-4">
-            <Image src={fileUrl} alt="" width={380} height={380} />
-          </div>
-        )}
-        <button
-          onClick={createMarket}
-          className="font-bold mt-4 bg-purple-500 text-white rounded p-4 shadow-lg"
-        >
-          Mint NFT
-        </button>
+    <>
+      <Header />
+      <div className="flex justify-center">
+        <div className="w-1/2 flex flex-col pb-12">
+          <input
+            placeholder="Asset Name"
+            className="mt-8 border rounded p-4"
+            onChange={(e) =>
+              updateFormInput({ ...formInput, name: e.target.value })
+            }
+          />
+          <textarea
+            placeholder="Asset Description"
+            className="mt-2 border rounded p-4"
+            onChange={(e) =>
+              updateFormInput({ ...formInput, description: e.target.value })
+            }
+          />
+          <input
+            placeholder="Asset Price in ETH"
+            className="mt-2 border rounded p-4"
+            onChange={(e) =>
+              updateFormInput({ ...formInput, price: e.target.value })
+            }
+          />
+          <input
+            type="file"
+            name="Asset"
+            className="mt-4"
+            onChange={onChange}
+          />
+          {fileUrl && (
+            <div className="rounded mt-4">
+              <Image src={fileUrl} alt="" width={380} height={380} />
+            </div>
+          )}
+          <button
+            onClick={createMarket}
+            className="font-bold mt-4 bg-purple-500 text-white rounded p-4 shadow-lg"
+          >
+            Mint NFT
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
