@@ -95,9 +95,6 @@ export default function Marketplace() {
     }
   }
 
-  if (loadingState === "loaded" && !nfts.length)
-    return <h1 className="px-20 py-7 text-4x1">No NFTs in marketplace</h1>;
-
   return (
     <div className="overflow-hidden">
       <Header />
