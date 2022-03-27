@@ -32,7 +32,9 @@ const Hero = () => {
               Cuban artist community.
             </div>
             <div className={style.ctaContainer}>
-              <button className={style.accentedButton}>Explore</button>
+              <Link href="/marketplace">
+                <button className={style.accentedButton}>Explore</button>
+              </Link>
               <Link href="/create">
                 <button className={style.button}>Create</button>
               </Link>
