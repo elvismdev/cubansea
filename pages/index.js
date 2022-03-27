@@ -6,6 +6,7 @@ import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
 import Head from "next/head";
 import Header from "../components/Header";
+import Hero from "../components/Hero";
 
 import { nftaddress, nftmarketaddress } from "../config";
 
@@ -102,6 +103,7 @@ export default function Home() {
   return (
     <>
       <Header />
+      <Hero />
       <div className="flex justify-center">
         <div className="px-4" style={{ maxWidth: "1600px" }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
