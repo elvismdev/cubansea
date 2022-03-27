@@ -13,7 +13,7 @@ import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
 const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
-export default function MintItem() {
+export default function Create() {
   const [fileUrl, setFileUrl] = useState(null);
   const [formInput, updateFormInput] = useState({
     price: "",

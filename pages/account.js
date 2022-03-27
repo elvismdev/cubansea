@@ -12,7 +12,7 @@ import { nftaddress, nftmarketaddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
-export default function AccountDashboard() {
+export default function Account() {
   // Array of NTFs.
   const [nfts, setNfts] = useState([]);
   const [sold, setSold] = useState([]);
