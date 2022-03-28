@@ -64,12 +64,12 @@ const NFTCard = ({ nftItem, buyNFT }) => {
           </div> */}
         </div>
       </div>
-      <button
+      {/* <button
         className="w-full bg-purple-500 text-white font-bold py-2 px-12 rounded"
         onClick={() => buyNFT(nftItem)}
       >
         Buy
-      </button>
+      </button> */}
     </div>
   );
 };
