@@ -8,6 +8,7 @@ import { providerOptions } from "../../wallets/providerOptions";
 import NFTImage from "../../components/nft/NFTImage";
 import GeneralDetails from "../../components/nft/GeneralDetails";
 import ItemActivity from "../../components/nft/ItemActivity";
+import Purchase from "../../components/nft/Purchase";
 
 import { nftaddress, nftmarketaddress } from "../../config";
 
@@ -103,6 +104,7 @@ const Nft = () => {
             </div>
             <div className={style.detailsContainer}>
               <GeneralDetails selectedNft={selectedNft} />
+              <Purchase selectedNft={selectedNft} />
             </div>
           </div>
           <ItemActivity />
