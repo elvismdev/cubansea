@@ -149,6 +149,15 @@ contract CSMarket is ReentrancyGuard {
         return items;
     }
 
+    // Function to fech single market item by ID.
+    function getMarketToken(uint256 itemId)
+        public
+        view
+        returns (MarketToken memory)
+    {
+        return idToMarketToken[itemId];
+    }
+
     // Returns NFTs that the user has purchased.
     function fetchMyNFTs() public view returns (MarketToken[] memory) {
         uint256 totalItemCount = _tokenIds.current();
