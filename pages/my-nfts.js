@@ -7,7 +7,8 @@ import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
 import Header from "../components/Header";
-import toast from "../components/Toast";
+// import toast from "../components/Toast";
+// import { client } from "../lib/sanityClient";
 
 import { nftaddress, nftmarketaddress } from "../config";
 
@@ -30,11 +31,11 @@ export default function MyAssets() {
     });
   }
 
-  const welcomeUser = (userName = "Unnamed", toastHandler = toast) =>
-    toastHandler({
-      type: "success",
-      message: `Welcome back${userName !== "Unnamed" ? ` ${userName}` : ""}!`,
-    });
+  // const welcomeUser = (userName = "Unnamed", toastHandler = toast) =>
+  //   toastHandler({
+  //     type: "success",
+  //     message: `Welcome back${userName !== "Unnamed" ? ` ${userName}` : ""}!`,
+  //   });
 
   // Function to connnect wallet.
   const connectWallet = async () => {
@@ -68,7 +69,19 @@ export default function MyAssets() {
   useEffect(() => {
     if (!address) return;
     (async () => {
+      // Create user in database.
+      // const userDoc = {
+      //   _type: "users",
+      //   _id: address,
+      //   userName: "Unnamed",
+      //   walletAddress: address,
+      // };
+      // const result = await client.createIfNotExists(userDoc);
+
+      // Show toast welcoming the user.
       // welcomeUser();
+
+      // Load user NFTs.
       loadNFTs();
     })();
   }, [address]);
