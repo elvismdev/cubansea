@@ -8,7 +8,6 @@ import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
 import Header from "../components/Header";
 // import toast from "../components/Toast";
-// import { client } from "../lib/sanityClient";
 
 import { nftaddress, nftmarketaddress } from "../config";
 
@@ -60,6 +59,26 @@ export default function MyAssets() {
     setNfts([]);
   };
 
+  // Function to create user if doesn't exists after wallet connection.
+  async function createIfNotExists(user) {
+    const response = await axios.post("/api/users", {
+      where: {
+        walletAddress: user.walletAddress,
+      },
+      update: {},
+      create: {
+        walletAddress: user.walletAddress,
+        userName: user.userName,
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(response.statusText);
+    }
+
+    return response;
+  }
+
   useEffect(() => {
     if (web3Modal.cachedProvider) {
       connectWallet();
@@ -69,14 +88,12 @@ export default function MyAssets() {
   useEffect(() => {
     if (!address) return;
     (async () => {
-      // Create user in database.
-      // const userDoc = {
-      //   _type: "users",
-      //   _id: address,
-      //   userName: "Unnamed",
-      //   walletAddress: address,
-      // };
-      // const result = await client.createIfNotExists(userDoc);
+      // Create user in database with Prisma client.
+      const userData = {
+        userName: "Unnamed",
+        walletAddress: address,
+      };
+      const result = await createIfNotExists(userData);
 
       // Show toast welcoming the user.
       // welcomeUser();
