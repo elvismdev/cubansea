@@ -1,5 +1,6 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
+require("hardhat-abi-exporter");
 const infuraProjectId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID;
 const keyData = process.env.PRIVATE_KEY;
 
@@ -26,5 +27,9 @@ module.exports = {
         runs: 200,
       },
     },
+  },
+  abiExporter: {
+    path: "./abi/",
+    clear: true,
   },
 };

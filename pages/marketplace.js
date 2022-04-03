@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import client from "../lib/urql";
 import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
 import Header from "../components/Header";
@@ -13,10 +14,39 @@ if (process.env.NEXT_PUBLIC_RPC_URL) {
   rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
 }
 
-import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
-export default function Marketplace() {
+const fetchMarketTokensByOwner = `
+  query FetchMarketTokensByOwner($ownerAddress: String!) {
+    erc721Tokens(
+      where: {owner: $ownerAddress}
+      orderDirection: desc
+      orderBy: identifier
+      first: 10
+    ) {
+      identifier
+      uri
+      owner {
+        id
+      }
+    }
+  }
+`;
+
+const fetchMarketTokenMintedByTokenId = `
+  query FetchMarketTokenMintedByTokenId($tokenId: String!) {
+    marketTokenMinteds(
+      where: {tokenId: $tokenId}
+    ) {
+      price
+      seller
+      tokenId
+    }
+  }
+`;
+
+export default function Marketplace(props) {
+  const { tokens } = props;
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
 
@@ -29,45 +59,9 @@ export default function Marketplace() {
   }
 
   useEffect(() => {
-    loadNFTs();
-  }, []);
-
-  // Function to load NFTs.
-  async function loadNFTs() {
-    // What we want to load:
-    // *** provider, tokenContract, marketContract, data for our marketItems ***
-
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-    const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
-    const marketContract = new ethers.Contract(
-      nftmarketaddress,
-      CSMarket.abi,
-      provider
-    );
-    const data = await marketContract.fetchMarketTokens();
-
-    const items = await Promise.all(
-      data.map(async (i) => {
-        const tokenUri = await tokenContract.tokenURI(i.tokenId);
-        // We want to get the token metadata - json.
-        const meta = await axios.get(tokenUri);
-        let price = ethers.utils.formatUnits(i.price.toString(), "ether");
-        let item = {
-          price,
-          itemId: i.itemId.toNumber(),
-          seller: i.seller,
-          owner: i.owner,
-          image: meta.data.image,
-          name: meta.data.name,
-          description: meta.data.description,
-        };
-        return item;
-      })
-    );
-
-    setNfts(items);
+    setNfts(tokens);
     setLoadingState("loaded");
-  }
+  }, []);
 
   // Function to buy NFTs for market.
   async function buyNFT(nft) {
@@ -89,7 +83,6 @@ export default function Marketplace() {
       );
 
       await transaction.wait();
-      loadNFTs();
     } catch (error) {
       // console.log(error);
     }
@@ -109,4 +102,57 @@ export default function Marketplace() {
       )}
     </div>
   );
+}
+
+async function fetchData() {
+  let data = await client
+    .query(fetchMarketTokensByOwner, {
+      ownerAddress: nftmarketaddress.toLowerCase(),
+    })
+    .toPromise();
+
+  let tokensData = await Promise.all(
+    data.data.erc721Tokens.map(async (token) => {
+      let meta;
+      let tokenMarketData;
+      try {
+        // Get object with Token market price.
+        const tokenMarketDataResponse = await client
+          .query(fetchMarketTokenMintedByTokenId, {
+            tokenId: token.identifier,
+          })
+          .toPromise();
+        tokenMarketData = tokenMarketDataResponse.data.marketTokenMinteds.find(
+          (e) => e !== undefined
+        );
+
+        // Get object with market metadata.
+        const metaData = await axios.get(token.uri);
+        meta = metaData.data;
+      } catch (err) {}
+      if (!meta || !tokenMarketData) return;
+
+      let price = ethers.utils.formatUnits(tokenMarketData.price, "ether");
+      let tokenItem = {
+        price,
+        itemId: Number(token.identifier),
+        seller: tokenMarketData.seller,
+        owner: token.owner.id,
+        image: meta.image,
+        name: meta.name,
+        description: meta.description,
+      };
+      return tokenItem;
+    })
+  );
+  return tokensData;
+}
+
+export async function getServerSideProps() {
+  const data = await fetchData();
+  return {
+    props: {
+      tokens: data,
+    },
+  };
 }
