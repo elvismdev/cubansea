@@ -125,6 +125,7 @@ contract CSMarket is ReentrancyGuard {
     {
         uint256 price = idToMarketToken[itemId].price;
         uint256 tokenId = idToMarketToken[itemId].tokenId;
+        address seller = idToMarketToken[itemId].seller;
         require(
             msg.value == price,
             "Please submit the asking price in order to continue"
@@ -144,7 +145,7 @@ contract CSMarket is ReentrancyGuard {
             itemId,
             nftContract,
             tokenId,
-            address(this),
+            seller,
             msg.sender,
             price,
             true
