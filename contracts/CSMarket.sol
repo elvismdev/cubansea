@@ -93,7 +93,7 @@ contract CSMarket is ReentrancyGuard {
         );
 
         // NFT transaction.
-        IERC721(nftContract).safeTransferFrom(msg.sender, address(this), tokenId);
+        IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
         emit MarketTokenMinted(
             itemId,
@@ -133,7 +133,7 @@ contract CSMarket is ReentrancyGuard {
         // Transfer the amount to the seller.
         idToMarketToken[itemId].seller.transfer(msg.value);
         // Transfer the token from contract address to the buyer.
-        IERC721(nftContract).safeTransferFrom(address(this), msg.sender, tokenId);
+        IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
         idToMarketToken[itemId].owner = payable(msg.sender);
         idToMarketToken[itemId].sold = true;
         _tokensSold.increment();
