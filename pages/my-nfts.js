@@ -6,6 +6,8 @@ import axios from "axios";
 import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
+import Header from "../components/Header";
+// import toast from "../components/Toast";
 
 import { nftaddress, nftmarketaddress } from "../config";
 
@@ -15,6 +17,8 @@ import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 export default function MyAssets() {
   // Array of NTFs.
   const [nfts, setNfts] = useState([]);
+  const [address, setAddress] = useState(null);
+  const [signer, setSigner] = useState(null);
   const [provider, setProvider] = useState(null);
   const [loadingState, setLoadingState] = useState("not-loaded");
 
@@ -26,12 +30,21 @@ export default function MyAssets() {
     });
   }
 
+  // const welcomeUser = (userName = "Unnamed", toastHandler = toast) =>
+  //   toastHandler({
+  //     type: "success",
+  //     message: `Welcome back${userName !== "Unnamed" ? ` ${userName}` : ""}!`,
+  //   });
+
   // Function to connnect wallet.
   const connectWallet = async () => {
     try {
       const connection = await web3Modal.connect();
       const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
       setProvider(provider);
+      setSigner(signer);
+      setAddress(await signer.getAddress());
     } catch (error) {
       // console.log(error);
     }
@@ -41,8 +54,30 @@ export default function MyAssets() {
   const disconnectWallet = async () => {
     await web3Modal.clearCachedProvider();
     setProvider(null);
+    setSigner(null);
+    setAddress(null);
     setNfts([]);
   };
+
+  // Function to create user if doesn't exists after wallet connection.
+  async function createIfNotExists(user) {
+    const response = await axios.post("/api/users", {
+      where: {
+        walletAddress: user.walletAddress,
+      },
+      update: {},
+      create: {
+        walletAddress: user.walletAddress,
+        userName: user.userName,
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(response.statusText);
+    }
+
+    return response;
+  }
 
   useEffect(() => {
     if (web3Modal.cachedProvider) {
@@ -51,18 +86,25 @@ export default function MyAssets() {
   }, []);
 
   useEffect(() => {
-    if (provider) {
+    if (!address) return;
+    (async () => {
+      // Create user in database with Prisma client.
+      const userData = {
+        userName: "Unnamed",
+        walletAddress: address,
+      };
+      const result = await createIfNotExists(userData);
+
+      // Show toast welcoming the user.
+      // welcomeUser();
+
+      // Load user NFTs.
       loadNFTs();
-    }
-  }, [provider]);
+    })();
+  }, [address]);
 
   // Function to load NFTs.
   async function loadNFTs() {
-    // What we want to load:
-    // We want to get the msg.sender hook up to the signer to display the owner NFTs.
-
-    const signer = provider.getSigner();
-
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
       nftmarketaddress,
@@ -96,7 +138,8 @@ export default function MyAssets() {
 
   return (
     <>
-      {!provider ? (
+      <Header />
+      {!address ? (
         <button
           className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
           onClick={connectWallet}
@@ -111,7 +154,7 @@ export default function MyAssets() {
           Disconnect Wallet
         </button>
       )}
-      {provider && loadingState === "loaded" && !nfts.length ? (
+      {address && loadingState === "loaded" && !nfts.length ? (
         <h1 className="px-20 py-7 text-4x1">
           You do not own any NFTs currently :(
         </h1>
