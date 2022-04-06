@@ -9,11 +9,6 @@ import NFTCard from "../components/NFTCard";
 
 import { nftaddress, nftmarketaddress } from "../config";
 
-let rpcUrl = null;
-if (process.env.NEXT_PUBLIC_RPC_URL) {
-  rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
-}
-
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
 const fetchMarketTokensByOwner = `
@@ -26,21 +21,13 @@ const fetchMarketTokensByOwner = `
     ) {
       identifier
       uri
+      price
+      seller {
+        id
+      }
       owner {
         id
       }
-    }
-  }
-`;
-
-const fetchMarketTokenMintedByTokenId = `
-  query FetchMarketTokenMintedByTokenId($tokenId: String!) {
-    marketTokenMinteds(
-      where: {tokenId: $tokenId}
-    ) {
-      price
-      seller
-      tokenId
     }
   }
 `;
@@ -114,29 +101,18 @@ async function fetchData() {
   let tokensData = await Promise.all(
     data.data.erc721Tokens.map(async (token) => {
       let meta;
-      let tokenMarketData;
       try {
-        // Get object with Token market price.
-        const tokenMarketDataResponse = await client
-          .query(fetchMarketTokenMintedByTokenId, {
-            tokenId: token.identifier,
-          })
-          .toPromise();
-        tokenMarketData = tokenMarketDataResponse.data.marketTokenMinteds.find(
-          (e) => e !== undefined
-        );
-
         // Get object with market metadata.
         const metaData = await axios.get(token.uri);
         meta = metaData.data;
       } catch (err) {}
-      if (!meta || !tokenMarketData) return;
+      if (!meta) return;
 
-      let price = ethers.utils.formatUnits(tokenMarketData.price, "ether");
+      let price = ethers.utils.formatUnits(token.price, "ether");
       let tokenItem = {
         price,
         itemId: Number(token.identifier),
-        seller: tokenMarketData.seller,
+        seller: token.seller.id,
         owner: token.owner.id,
         image: meta.image,
         name: meta.name,
