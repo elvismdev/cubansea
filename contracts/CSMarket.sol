@@ -106,6 +106,17 @@ contract CSMarket is ReentrancyGuard {
         );
     }
 
+    // listen to events when market token is sold.
+    event MarketTokenSold(
+        uint256 indexed itemId,
+        address indexed nftContract,
+        uint256 indexed tokenId,
+        address seller,
+        address owner,
+        uint256 price,
+        bool sold
+    );
+
     // Function to conduct transactions and market sales.
     function createMarketSale(address nftContract, uint256 itemId)
         public
@@ -114,6 +125,7 @@ contract CSMarket is ReentrancyGuard {
     {
         uint256 price = idToMarketToken[itemId].price;
         uint256 tokenId = idToMarketToken[itemId].tokenId;
+        address seller = idToMarketToken[itemId].seller;
         require(
             msg.value == price,
             "Please submit the asking price in order to continue"
@@ -128,6 +140,16 @@ contract CSMarket is ReentrancyGuard {
         _tokensSold.increment();
 
         payable(owner).transfer(listingPrice);
+
+        emit MarketTokenSold(
+            itemId,
+            nftContract,
+            tokenId,
+            seller,
+            msg.sender,
+            price,
+            true
+        );
     }
 
     // Function to fetchMarketItems - minting, buying and selling.
