@@ -11,7 +11,7 @@
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.0.5",
     "@nomiclabs/hardhat-ethers": "^2.0.5",
-    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@nomiclabs/hardhat-waffle": "^1.0.0",
     "@openzeppelin/contracts": "^4.5.0",
     "@prisma/client": "^3.11.1",
     "@walletconnect/web3-provider": "^1.7.5",
@@ -19,7 +19,7 @@
     "chai": "^4.3.6",
     "daisyui": "^2.13.6",
     "dotenv": "^16.0.0",
-    "ethereum-waffle": "^4.0.0-alpha.0",
+    "ethereum-waffle": "^2.5.1",
     "ethers": "^5.6.1",
     "graphql": "^16.3.0",
     "hardhat": "^2.9.1",
