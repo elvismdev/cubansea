@@ -1,0 +1,53 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: CSMarket
+    network: mumbai
+    source:
+      address: "0xb9c3bC5d2713063C72cdd98Fe50E50C0D682E483"
+      abi: CSMarket
+      startBlock: 25807235
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - MarketTokenMinted
+        - MarketTokenSold
+      abis:
+        - name: CSMarket
+          file: ./abis/CSMarket.json
+      eventHandlers:
+        - event: MarketTokenMinted(indexed uint256,indexed address,indexed uint256,address,address,uint256,bool)
+          handler: handleMarketTokenMinted
+        - event: MarketTokenSold(indexed uint256,indexed address,indexed uint256,address,address,uint256,bool)
+          handler: handleMarketTokenSold
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: NFT
+    network: mumbai
+    source:
+      address: "0x3889860904C74009AC6F85012346Aa1FC3f5D121"
+      abi: IERC721
+      startBlock: 25807236
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ERC721Contract
+        - ERC721Token
+        - User
+      abis:
+        - name: IERC721
+          file: ./node_modules/@openzeppelin/contracts/build/contracts/IERC721Metadata.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./node_modules/@openzeppelin/subgraphs/src/datasources/erc721.ts
