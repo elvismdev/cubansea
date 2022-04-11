@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import client from "../lib/urql";
 import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
@@ -16,12 +15,14 @@ const fetchMarketTokensByOwner = `
     erc721Tokens(
       where: {owner: $ownerAddress}
       orderDirection: desc
-      orderBy: identifier
+      orderBy: createdAtTimestamp
       first: 10
     ) {
       identifier
-      uri
       price
+      description
+      image
+      name
       seller {
         id
       }
@@ -100,23 +101,17 @@ async function fetchData() {
 
   let tokensData = await Promise.all(
     data.data.erc721Tokens.map(async (token) => {
-      let meta;
-      try {
-        // Get object with market metadata.
-        const metaData = await axios.get(token.uri);
-        meta = metaData.data;
-      } catch (err) {}
-      if (!meta) return;
-
+      // Format price value.
       let price = ethers.utils.formatUnits(token.price, "ether");
+      // Construct tokenItem object.
       let tokenItem = {
         price,
         itemId: Number(token.identifier),
         seller: token.seller.id,
         owner: token.owner.id,
-        image: meta.image,
-        name: meta.name,
-        description: meta.description,
+        image: token.image,
+        name: token.name,
+        description: token.description,
       };
       return tokenItem;
     })
