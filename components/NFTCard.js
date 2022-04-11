@@ -29,13 +29,15 @@ const NFTCard = ({ nftItem, buyNFT }) => {
       }}
     >
       <div className={style.imgContainer}>
-        <Image
-          src={nftItem.image}
-          alt={nftItem.name}
-          width={380}
-          height={380}
-          className={style.nftImg}
-        />
+        {nftItem.image && (
+          <Image
+            src={nftItem.image}
+            alt={nftItem.name}
+            width={380}
+            height={380}
+            className={style.nftImg}
+          />
+        )}
       </div>
       <div className={style.details}>
         <div className={style.info}>
