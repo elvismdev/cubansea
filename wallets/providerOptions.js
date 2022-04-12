@@ -1,4 +1,4 @@
-import WalletConnect from "@walletconnect/web3-provider";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 const infuraProjectId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID;
 
@@ -14,7 +14,7 @@ export const providerOptions = {
     },
   },
   walletconnect: {
-    package: WalletConnect, // required
+    package: WalletConnectProvider, // required
     options: {
       infuraId: infuraProjectId, // required
     },
