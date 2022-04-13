@@ -1,4 +1,3 @@
-import Header from "../../components/Header";
 import { ethers } from "ethers";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -68,7 +67,6 @@ const Nft = () => {
 
   return (
     <div>
-      <Header />
       <div className={style.wrapper}>
         <div className={style.container}>
           <div className={style.topContent}>

@@ -3,9 +3,14 @@ import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
 import { AccountContext } from "../context/AccountContext";
 import { ToastContainer } from "react-toastify";
+import Header from "../components/Header";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 import "./app.css";
+
+const style = {
+  container: ``,
+};
 
 function CubanSeaMarketplace({ Component, pageProps }) {
   /* create local state to save account information after signin */
@@ -43,7 +48,12 @@ function CubanSeaMarketplace({ Component, pageProps }) {
 
   return (
     <>
-      <Component {...pageProps} />
+      <Header />
+      <div className={style.container}>
+        <AccountContext.Provider value={account}>
+          <Component {...pageProps} connect={connect} />
+        </AccountContext.Provider>
+      </div>
       <ToastContainer
         position="bottom-right"
         autoClose={8000}

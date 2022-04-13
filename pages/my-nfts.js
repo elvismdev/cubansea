@@ -6,7 +6,6 @@ import axios from "axios";
 import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
-import Header from "../components/Header";
 // import toast from "../components/Toast";
 
 import { nftaddress, nftmarketaddress } from "../config";
@@ -138,7 +137,6 @@ export default function MyAssets() {
 
   return (
     <>
-      <Header />
       {!address ? (
         <button
           className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"

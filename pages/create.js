@@ -8,7 +8,6 @@ import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
-import Header from "../components/Header";
 
 // In this component we set the IPFS up to host our NFT data of file storage.
 
@@ -97,7 +96,6 @@ export default function Create() {
 
   return (
     <>
-      <Header />
       <div className="flex justify-center">
         <div className="w-1/2 flex flex-col pb-12">
           <input

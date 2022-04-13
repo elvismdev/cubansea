@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import client from "../lib/urql";
 import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
-import Header from "../components/Header";
 import NFTCard from "../components/NFTCard";
 
 import { nftaddress, nftmarketaddress } from "../config";
@@ -78,7 +77,6 @@ export default function Marketplace(props) {
 
   return (
     <div className="overflow-hidden">
-      <Header />
       {loadingState === "loaded" && !nfts.length ? (
         <h1 className="px-20 py-7 text-4x1">No NFTs in marketplace</h1>
       ) : (
