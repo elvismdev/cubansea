@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { providers } from "ethers";
 import Web3Modal from "web3modal";
 import { providerOptions } from "../wallets/providerOptions";
-import { AccountContext } from "../context/AccountContext";
+import { WalletContext } from "../context/walletContext";
 import { ToastContainer } from "react-toastify";
 import Header from "../components/Header";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,47 +13,115 @@ const style = {
   container: ``,
 };
 
+let web3Modal;
+if (typeof window !== "undefined") {
+  web3Modal = new Web3Modal({
+    // network: "mainnet", // optional
+    cacheProvider: true,
+    providerOptions, // required
+  });
+}
+
+const accountDetails = {
+  provider: null,
+  address: null,
+  signer: null,
+  web3Provider: null,
+  network: null,
+};
+
 function CubanSeaMarketplace({ Component, pageProps }) {
-  /* create local state to save account information after signin */
-  const [account, setAccount] = useState(null);
+  // const { account, setAccountDetails } = useWallet();
+  const [account, setAccountDetails] = useState(accountDetails);
+  const { provider } = account;
 
-  /* web3Modal configuration for enabling wallet access */
-  async function getWeb3Modal() {
-    const web3Modal = new Web3Modal({
-      // network: "mainnet", // optional
-      cacheProvider: false, // optional
-      providerOptions, // required
-    });
-    return web3Modal;
-  }
+  // Function to connect to wallet.
+  const connect = useCallback(async function () {
+    const provider = await web3Modal.connect();
+    const web3Provider = new providers.Web3Provider(provider);
+    const signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+    const network = await web3Provider.getNetwork();
+    const accountDetails = {
+      provider,
+      web3Provider,
+      signer,
+      address,
+      network,
+    };
+    setAccountDetails(accountDetails);
+  }, []);
 
-  /* the connect function uses web3 modal to connect to the user's wallet */
-  async function connect() {
-    try {
-      const web3Modal = await getWeb3Modal();
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
-      setAccount(await signer.getAddress());
-    } catch (err) {
-      console.log("error:", err);
+  // Function to disconnect from wallet.
+  const disconnect = useCallback(
+    async function () {
+      await web3Modal.clearCachedProvider();
+      if (provider?.disconnect && typeof provider.disconnect === "function") {
+        await provider.disconnect();
+      }
+      //reset the state here
+      const accountDetails = {
+        provider: null,
+        web3Provider: null,
+        signer: null,
+        address: null,
+        network: null,
+      };
+      setAccountDetails(accountDetails);
+    },
+    [provider]
+  );
+
+  // Auto connect to the cached provider
+  useEffect(() => {
+    if (web3Modal.cachedProvider) {
+      connect();
     }
-  }
+  }, [connect]);
 
-  // Function to disconnect wallet.
-  async function disconnect() {
-    const web3Modal = await getWeb3Modal();
-    web3Modal.clearCachedProvider();
-    setAccount(null);
-  }
+  // Listen to events on the provider object to handle some scenarios.
+  useEffect(() => {
+    if (provider?.on) {
+      const handleAccountsChanged = (accounts) => {
+        // eslint-disable-next-line no-console
+        console.log("accountsChanged", accounts);
+        setAccountDetails({
+          ...account,
+          address: accounts[0],
+        });
+      };
+
+      const handleChainChanged = (_hexChainId) => {
+        window.location.reload();
+      };
+
+      const handleDisconnect = (error) => {
+        console.log("disconnect", error);
+        disconnect();
+      };
+
+      provider.on("accountsChanged", handleAccountsChanged);
+      provider.on("chainChanged", handleChainChanged);
+      provider.on("disconnect", handleDisconnect);
+
+      // Subscription Cleanup
+      return () => {
+        if (provider.removeListener) {
+          provider.removeListener("accountsChanged", handleAccountsChanged);
+          provider.removeListener("chainChanged", handleChainChanged);
+          provider.removeListener("disconnect", handleDisconnect);
+        }
+      };
+    }
+  }, [provider, disconnect]);
 
   return (
     <>
       <Header />
       <div className={style.container}>
-        <AccountContext.Provider value={account}>
-          <Component {...pageProps} connect={connect} />
-        </AccountContext.Provider>
+        <WalletContext.Provider value={{ account, setAccountDetails }}>
+          <Component {...pageProps} connect={connect} disconnect={disconnect} />
+        </WalletContext.Provider>
       </div>
       <ToastContainer
         position="bottom-right"
