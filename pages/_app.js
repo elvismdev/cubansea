@@ -31,7 +31,6 @@ const accountDetails = {
 };
 
 function CubanSeaMarketplace({ Component, pageProps }) {
-  // const { account, setAccountDetails } = useWallet();
   const [account, setAccountDetails] = useState(accountDetails);
   const { provider } = account;
 
