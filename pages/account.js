@@ -1,77 +1,48 @@
 // We want to load the users NFTs and display.
 
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import Web3Modal from "web3modal";
-import { providerOptions } from "../wallets/providerOptions";
 import Image from "next/image";
+import { WalletContext } from "../context/walletContext";
 
 import { nftaddress, nftmarketaddress } from "../config";
 
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import CSMarket from "../artifacts/contracts/CSMarket.sol/CSMarket.json";
 
-export default function Account() {
+export default function Account(props) {
+  const { connect, disconnect } = props;
+  const { web3Provider, signer, address } = useContext(WalletContext);
+  const [web3ProviderValue, setWeb3ProviderValue] = web3Provider;
+  const [signerValue, setSignerValue] = signer;
+  const [addressValue, setAddressValue] = address;
   // Array of NTFs.
   const [nfts, setNfts] = useState([]);
   const [sold, setSold] = useState([]);
-  const [address, setAddress] = useState(null);
-  const [signer, setSigner] = useState(null);
-  const [provider, setProvider] = useState(null);
   const [loadingState, setLoadingState] = useState("not-loaded");
 
-  let web3Modal;
-  if (typeof window !== "undefined") {
-    web3Modal = new Web3Modal({
-      cacheProvider: true, // optional
-      providerOptions, // required
-    });
-  }
-
-  // Function to connnect wallet.
-  const connectWallet = async () => {
-    try {
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
-      setProvider(provider);
-      setSigner(signer);
-      setAddress(await signer.getAddress());
-    } catch (error) {
-      // console.log(error);
-    }
-  };
-
-  // Function to disconnect wallet.
-  const disconnectWallet = async () => {
-    await web3Modal.clearCachedProvider();
-    setProvider(null);
-    setSigner(null);
-    setAddress(null);
-    setNfts([]);
-  };
-
   useEffect(() => {
-    if (web3Modal.cachedProvider) {
-      connectWallet();
+    if (!addressValue) {
+      setNfts([]);
+      return;
     }
-  }, []);
-
-  useEffect(() => {
-    if (!address) return;
     (async () => {
       loadNFTs();
     })();
-  }, [address]);
+  }, [addressValue]);
 
   // Function to load NFTs.
   async function loadNFTs() {
-    const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
+    const tokenContract = new ethers.Contract(
+      nftaddress,
+      NFT.abi,
+      web3ProviderValue
+    );
     const marketContract = new ethers.Contract(
       nftmarketaddress,
       CSMarket.abi,
-      signer
+      signerValue
     );
     const data = await marketContract.fetchItemsCreated();
 
@@ -103,22 +74,22 @@ export default function Account() {
 
   return (
     <>
-      {!address ? (
+      {!addressValue ? (
         <button
           className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
-          onClick={connectWallet}
+          onClick={connect}
         >
           Connect Wallet
         </button>
       ) : (
         <button
           className="mt-5 bg-purple-500 text-white font-bold py-3 px-12 rounded"
-          onClick={disconnectWallet}
+          onClick={disconnect}
         >
           Disconnect Wallet
         </button>
       )}
-      {address && loadingState === "loaded" && !nfts.length ? (
+      {addressValue && loadingState === "loaded" && !nfts.length ? (
         <h1 className="px-20 py-7 text-4x1">You have not minted any NFTs!</h1>
       ) : (
         <div className="p-4">
