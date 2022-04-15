@@ -22,33 +22,26 @@ if (typeof window !== "undefined") {
   });
 }
 
-const accountDetails = {
-  provider: null,
-  address: null,
-  signer: null,
-  web3Provider: null,
-  network: null,
-};
-
 function CubanSeaMarketplace({ Component, pageProps }) {
-  const [account, setAccountDetails] = useState(accountDetails);
-  const { provider } = account;
+  const [provider, setProvider] = useState(null);
+  const [web3Provider, setWeb3Provider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [address, setAddress] = useState(null);
+  const [network, setNetwork] = useState(null);
 
   // Function to connect to wallet.
   const connect = useCallback(async function () {
-    const provider = await web3Modal.connect();
-    const web3Provider = new providers.Web3Provider(provider);
-    const signer = web3Provider.getSigner();
-    const address = await signer.getAddress();
-    const network = await web3Provider.getNetwork();
-    const accountDetails = {
-      provider,
-      web3Provider,
-      signer,
-      address,
-      network,
-    };
-    setAccountDetails(accountDetails);
+    const connProvider = await web3Modal.connect();
+    const connWeb3Provider = new providers.Web3Provider(connProvider);
+    const connSigner = connWeb3Provider.getSigner();
+    const connAddress = await connSigner.getAddress();
+    const connNetwork = await connWeb3Provider.getNetwork();
+    // Set connected account state values.
+    setProvider(connProvider);
+    setWeb3Provider(connWeb3Provider);
+    setSigner(connSigner);
+    setAddress(connAddress);
+    setNetwork(connNetwork);
   }, []);
 
   // Function to disconnect from wallet.
@@ -59,14 +52,11 @@ function CubanSeaMarketplace({ Component, pageProps }) {
         await provider.disconnect();
       }
       //reset the state here
-      const accountDetails = {
-        provider: null,
-        web3Provider: null,
-        signer: null,
-        address: null,
-        network: null,
-      };
-      setAccountDetails(accountDetails);
+      setProvider(null);
+      setWeb3Provider(null);
+      setSigner(null);
+      setAddress(null);
+      setNetwork(null);
     },
     [provider]
   );
@@ -84,10 +74,7 @@ function CubanSeaMarketplace({ Component, pageProps }) {
       const handleAccountsChanged = (accounts) => {
         // eslint-disable-next-line no-console
         console.log("accountsChanged", accounts);
-        setAccountDetails({
-          ...account,
-          address: accounts[0],
-        });
+        setAddress(accounts[0]);
       };
 
       const handleChainChanged = (_hexChainId) => {
@@ -118,7 +105,15 @@ function CubanSeaMarketplace({ Component, pageProps }) {
     <>
       <Header />
       <div className={style.container}>
-        <WalletContext.Provider value={{ account, setAccountDetails }}>
+        <WalletContext.Provider
+          value={{
+            provider: [provider, setProvider],
+            web3Provider: [web3Provider, setWeb3Provider],
+            signer: [signer, setSigner],
+            address: [address, setAddress],
+            network: [network, setNetwork],
+          }}
+        >
           <Component {...pageProps} connect={connect} disconnect={disconnect} />
         </WalletContext.Provider>
       </div>
