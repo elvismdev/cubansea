@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { ethers } from "ethers";
 import { HiTag } from "react-icons/hi";
 import { IoMdWallet } from "react-icons/io";
-import Web3Modal from "web3modal";
-import { providerOptions } from "../../wallets/providerOptions";
 import toast from "../Toast";
 import { useRouter } from "next/router";
+import { WalletContext } from "../../context/walletContext";
 
 import { nftaddress, nftmarketaddress } from "../../config";
 
@@ -17,17 +16,11 @@ const style = {
   buttonText: `ml-2 text-lg font-semibold`,
 };
 
-const MakeOffer = ({ selectedNft }) => {
+const MakeOffer = ({ selectedNft, connect }) => {
+  const { signer } = useContext(WalletContext);
+  const [signerValue, setSignerValue] = signer;
   const [enableButton, setEnableButton] = useState(false);
   const router = useRouter();
-
-  let web3Modal;
-  if (typeof window !== "undefined") {
-    web3Modal = new Web3Modal({
-      cacheProvider: true, // optional
-      providerOptions, // required
-    });
-  }
 
   useEffect(() => {
     if (!selectedNft) return;
@@ -41,13 +34,11 @@ const MakeOffer = ({ selectedNft }) => {
   // Function to buy NFTs for market.
   async function buyNFT(nft) {
     try {
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
+      connect();
       const contract = new ethers.Contract(
         nftmarketaddress,
         CSMarket.abi,
-        signer
+        signerValue
       );
 
       const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
