@@ -49,7 +49,10 @@ export default function MyAssets(props) {
   }
 
   useEffect(() => {
-    if (!addressValue) return;
+    if (!addressValue) {
+      setNfts([]);
+      return;
+    }
     (async () => {
       // Create user in database with Prisma client.
       const userData = {
