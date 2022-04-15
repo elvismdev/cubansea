@@ -25,8 +25,7 @@ const style = {
   detailsContainer: `flex-[2] ml-4`,
 };
 
-const Nft = (props) => {
-  const { connect } = props;
+const Nft = () => {
   const [selectedNft, setSelectedNft] = useState();
   const router = useRouter();
 
@@ -76,7 +75,7 @@ const Nft = (props) => {
             </div>
             <div className={style.detailsContainer}>
               <GeneralDetails selectedNft={selectedNft} />
-              <Purchase selectedNft={selectedNft} connect={connect} />
+              <Purchase selectedNft={selectedNft} />
             </div>
           </div>
           <ItemActivity />
